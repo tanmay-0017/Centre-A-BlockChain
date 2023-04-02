@@ -85,6 +85,52 @@
 
 
     <script>
+
+var markup=null;
+
+const options = {
+            enableHighAccuracy: true,
+            // Get high accuracy reading, if available (default false)
+            timeout: 5000,
+            // Time to return a position successfully before error (default infinity)
+            maximumAge: 2000,
+            // Milliseconds for which it is acceptable to use cached position (default 0)
+        };
+        navigator.geolocation.watchPosition(success, error, options);
+        // Fires success function immediately and when user position changes
+        function success(pos) {
+            console.log("https://www.openstreetmap.org/#map=16/28.7503163/77.1164534");
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            const accuracy = pos.coords.accuracy;
+
+                markup =
+                `<a href="https://www.openstreetmap.org/#map=16/${lat}/${lng}">
+                Latitude :${lat}
+                Longitude :${lng}
+            </a>`;
+            console.log(markup);
+            // Accuracy in metres
+            document.getElementById('output').innerText = `
+           markup
+User coordinates: 
+Latitude ${lat}.
+Longitude ${lng}.
+Estimation accurate within ${Math.round(accuracy)} metres.`;
+        }
+        function error(err) {
+            if (err.code === 1) {
+                alert("Please allow geolocation access");
+                // Runs if user refuses access
+            } else {
+                alert("Cannot get current location");
+                // Runs if there was a technical problem.
+            }
+        }
+
+
+
+
         async function addHistory() {
     const accounts = await ethereum.request({
       method: "eth_requestAccounts",
@@ -98,11 +144,11 @@
     minute: '2-digit',
     second: '2-digit',
     }); // format date and time as DD/MM/YYYY, HH:MM:SS
- 
+    
  
     const productId = document.getElementById("productId").value;
 
-    const tx = await contract.methods.addHistory(productId, "The History was added on "+formattedDateTime+" "+"and received by CENTRE-A").send({ from: accounts[0] });
+    const tx = await contract.methods.addHistory(productId, "The History was added on "+formattedDateTime+" "+"and received by CENTRE-A" + "and the location of your goods is " + markup).send({ from: accounts[0] });
     console.log(tx);
   }
 
@@ -379,6 +425,11 @@
  );
 
 
+
+
+
+ 
+
     </script>
 
 
@@ -415,7 +466,7 @@
        <div class="form-group">
            <label for="history">History: CENTRE-A</label>
        </div>
-       <button type="button" class="btn btn-primary" onclick="addHistory()">Add History</button>
+       <button type="button" class="btn btn-primary" onclick="addHistory(),success(pos)">Add History</button>
        </form>
       
 
